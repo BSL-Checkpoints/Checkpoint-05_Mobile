@@ -8,9 +8,6 @@
  *   - Carrinho e pedido operam sobre `variantId`, NUNCA sobre o id do produto.
  */
 
-import type { OrderPickup } from './pickup';
-import type { RatingSummary } from './reviews';
-
 export type ProductType = 'SIMPLE' | 'VARIABLE';
 export type ProductState = 'DRAFT' | 'PUBLISHED' | 'HIDDEN';
 
@@ -74,7 +71,6 @@ export interface Product {
   options: { id: string; name: string; values: { id: string; value: string }[] }[];
   variants: ProductVariant[];
   images: ProductImage[];
-  rating?: RatingSummary | null;
   createdAt: string;
 }
 
@@ -136,7 +132,6 @@ export interface Order {
   total: number;
   items: OrderItem[];
   payment: Payment | null;
-  pickup?: OrderPickup | null;
   createdAt: string;
 }
 
