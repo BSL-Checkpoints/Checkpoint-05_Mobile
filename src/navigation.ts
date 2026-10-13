@@ -14,6 +14,7 @@ export type RootStackParamList = {
   Products: undefined;
   ProductDetail: { id: string; name: string };
   Cart: undefined;
+  Profile: undefined;
   
   Checkout: { pickupPoint?: PickupSelection } | undefined;
   Order: { id: string };
@@ -22,3 +23,5 @@ export type RootStackParamList = {
   ReviewForm: { productId: string; productName: string };
   PickupPoints: { mode?: 'browse' | 'select'; selectedId?: string } | undefined;
 };
+
+

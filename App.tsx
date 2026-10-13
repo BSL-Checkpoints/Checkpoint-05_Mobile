@@ -19,12 +19,13 @@ import { SignInScreen } from '@/screens/SignInScreen';
 import { SignUpScreen } from '@/screens/SignUpScreen';
 import { ForgotPasswordScreen } from '@/screens/ForgotPasswordScreen';
 import { ProductsScreen } from '@/screens/ProductsScreen';
+import { ProfileScreen } from '@/screens/ProfileScreen';
 import { ProductDetailScreen } from '@/screens/ProductDetailScreen';
 import { CartScreen } from '@/screens/CartScreen';
 import { CheckoutScreen } from '@/screens/CheckoutScreen';
 import { OrderScreen } from '@/screens/OrderScreen';
 import { OrdersScreen } from '@/screens/OrdersScreen';
-import { ReviewFormScreen } from '@/screens/ReviewFormScreen';
+import { ReviewFormScreen } from '@/components/ReviewFormScreen';
 import { PickupPointsScreen } from '@/screens/PickupPointsScreen';
 import type { AuthStackParamList, RootStackParamList } from '@/navigation';
 import { COLORS } from '@/styles/style';
@@ -54,11 +55,8 @@ function AppFlow() {
       }}
     >
       <AppStack.Screen name="Products" component={ProductsScreen} options={{ title: 'Tech Lab' }} />
-      <AppStack.Screen
-        name="ProductDetail"
-        component={ProductDetailScreen}
-        options={({ route }) => ({ title: route.params.name })}
-      />
+      <AppStack.Screen name="Profile" component={ProfileScreen} options={{ title: 'Meu perfil', }} />
+      <AppStack.Screen name="ProductDetail" component={ProductDetailScreen} options={({ route }) => ({ title: route.params.name })} />
       <AppStack.Screen name="Cart" component={CartScreen} options={{ title: 'Carrinho' }} />
       <AppStack.Screen name="Checkout" component={CheckoutScreen} options={{ title: 'Checkout' }} />
       <AppStack.Screen name="Order" component={OrderScreen} options={{ title: 'Pedido' }} />
