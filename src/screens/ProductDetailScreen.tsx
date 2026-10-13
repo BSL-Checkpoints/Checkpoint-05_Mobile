@@ -12,6 +12,8 @@ import { useCartMutations } from '@/hooks/useCartMutations';
 import { useSession } from '@/session/session';
 import { money } from '@/lib/format';
 import { Button, ErrorState, Loading } from '@/components/ui';
+import { FavoriteButton } from '@/components/FavoriteButton';
+import { ReviewsSection } from '@/components/ReviewsSection';
 import type { RootStackParamList } from '@/navigation';
 import type { ApiError, ProductVariant } from '@/types/api';
 import { BACKGROUND, COLORS } from '@/styles/style';
@@ -67,7 +69,10 @@ export function ProductDetailScreen({ route, navigation }: Props) {
         )}
 
         <View style={styles.info}>
-          <Text style={styles.name}>{product.name}</Text>
+          <View style={styles.nameRow}>
+            <Text style={[styles.name, styles.nameFlex]}>{product.name}</Text>
+            <FavoriteButton productId={product.id} productName={product.name} />
+          </View>
           {selected && <Text style={styles.price}>{money(selected.price)}</Text>}
           {product.description && <Text style={styles.desc}>{product.description}</Text>}
         </View>
@@ -109,12 +114,21 @@ export function ProductDetailScreen({ route, navigation }: Props) {
           onPress={handleAdd}
           disabled={outOfStock || !isLoggedIn || addItem.isPending}
         />
+
+        {/* CP5: média (vem do próprio produto) + lista + formulário de avaliação. */}
+        <ReviewsSection
+          productId={product.id}
+          rating={product.rating}
+          onWriteReview={() => navigation.navigate('ReviewForm', { productId: product.id, productName: product.name })}
+        />
       </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  nameFlex: { flex: 1 },
   scroll: { flex: 1, backgroundColor: BACKGROUND.backgorundMain },
   container: { padding: 16, flexGrow: 1 },
   card: {
