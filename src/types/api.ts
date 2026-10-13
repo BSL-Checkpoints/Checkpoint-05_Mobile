@@ -72,6 +72,8 @@ export interface Product {
   variants: ProductVariant[];
   images: ProductImage[];
   createdAt: string;
+  rating: { count: number; average: number };
+  reviewsCount: number; 
 }
 
 /** Item do carrinho (GET /cart). Note: usa `variantId`, não productId. */
