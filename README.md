@@ -10,15 +10,6 @@
 <table>
   <tr>
     <td width="130">
-      <img src="https://github.com/moisesBarsoti.png" width="120" style="border-radius: 50%;"/>
-    </td>
-    <td>
-      <b>Moisés Barsoti Andrade de Oliveira</b><br/>
-      <b>RM:</b> 565049 &nbsp;&nbsp;|&nbsp;&nbsp;<b>Turma:</b> 2TDSPG - FIAP <br/>
-    </td>
-  </tr>
-  <tr>
-    <td width="130">
       <img src="https://github.com/sSofia-s.png" width="120" style="border-radius: 50%;"/>
     </td>
     <td>
@@ -95,7 +86,7 @@ cp .env.example .env
 Preencha o `.env`:
 ```env
 EXPO_PUBLIC_API_URL=https://api.mockmerce.com.br
-EXPO_PUBLIC_API_KEY=sk_live_a291267df364f771d473e035c7d5311253fe7045b88afabf
+EXPO_PUBLIC_API_KEY=[sua chave ao rodar o app]
 EXPO_PUBLIC_STUDENT_RM=[seu RM ao rodar o app]
 ```
 
@@ -105,11 +96,6 @@ npx expo start
 ```
 Leia o QR code pelo Expo Go, ou pressione `a` para abrir no emulador Android.
 
----
-
-## 🔑 Acesso à loja
-
-- **API Key da loja:** `sk_live_a291267df364f771d473e035c7d5311253fe7045b88afabf`
 ---
 
 ## 🧠 Decisões de produto
