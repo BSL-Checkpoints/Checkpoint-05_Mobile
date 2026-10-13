@@ -4,17 +4,20 @@
  * useCart + mutations otimistas seguem iguais à Semana 2.
  */
 import { useState } from 'react';
-import { FlatList, StyleSheet, Text, View, TextInput, Alert } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Alert } from 'react-native';
+import Animated from 'react-native-reanimated';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useCart } from '@/hooks/useCart';
 import { useCartMutations } from '@/hooks/useCartMutations';
 import { useSession } from '@/session/session';
 import { money } from '@/lib/format';
+import { PressableScale } from '@/components/PressableScale';
 import { Button, ErrorState, Loading } from '@/components/ui';
+import { itemExiting, itemLayout, useMotionMode } from '@/lib/motion';
 import type { RootStackParamList } from '@/navigation';
 
 // Importando os tipos e o serviço criado para não violar os requisitos RNF-01 e RF-02 do CP4
-import type { ApiError, ShippingOption } from '@/types/api';
+import type { ApiError, CartItem, ShippingOption } from '@/types/api';
 import { getShippingQuote } from '@/services/shipping'; 
 import { BACKGROUND, COLORS } from '@/styles/style';
 
@@ -24,6 +27,8 @@ export function CartScreen({ navigation }: Props) {
   const { data: cart, isLoading, isError, error, refetch } = useCart();
   const { setQuantity, removeItem } = useCartMutations();
   const { customer, signOut } = useSession();
+  // Hooks sempre ANTES dos returns antecipados abaixo.
+  const mode = useMotionMode();
 
   // Estados do frete com tipagem estrita
   const [cep, setCep] = useState('');
@@ -69,8 +74,10 @@ export function CartScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <FlatList
+      {/* Animated.FlatList: os itens que ficam se acomodam (itemLayoutAnimation) quando um sai. */}
+      <Animated.FlatList<CartItem>
         data={items}
+        itemLayoutAnimation={itemLayout(mode)}
         keyExtractor={(it) => it.variantId}
         contentContainerStyle={styles.list}
         ListHeaderComponent={
@@ -79,7 +86,7 @@ export function CartScreen({ navigation }: Props) {
           </Text>
         }
         renderItem={({ item }) => (
-          <View style={styles.row}>
+          <Animated.View style={styles.row} exiting={itemExiting(mode)}>
             <View style={styles.info}>
               <Text style={styles.name} numberOfLines={2}>
                 {item.name}
@@ -89,24 +96,26 @@ export function CartScreen({ navigation }: Props) {
               </Text>
             </View>
             <View style={styles.qtyBox}>
-              <Text
-                style={styles.qtyBtn}
+              <PressableScale
+                hitSlop={8}
+                accessibilityLabel="Diminuir quantidade"
                 onPress={() => setQuantity.mutate({ variantId: item.variantId, quantity: item.quantity - 1 })}
               >
-                −
-              </Text>
+                <Text style={styles.qtyBtn}>−</Text>
+              </PressableScale>
               <Text style={styles.qty}>{item.quantity}</Text>
-              <Text
-                style={styles.qtyBtn}
+              <PressableScale
+                hitSlop={8}
+                accessibilityLabel="Aumentar quantidade"
                 onPress={() => setQuantity.mutate({ variantId: item.variantId, quantity: item.quantity + 1 })}
               >
-                +
-              </Text>
+                <Text style={styles.qtyBtn}>+</Text>
+              </PressableScale>
             </View>
-            <Text style={styles.remove} onPress={() => removeItem.mutate(item.variantId)}>
-              remover
-            </Text>
-          </View>
+            <PressableScale hitSlop={8} onPress={() => removeItem.mutate(item.variantId)}>
+              <Text style={styles.remove}>remover</Text>
+            </PressableScale>
+          </Animated.View>
         )}
         ListFooterComponent={
           items.length ? (
