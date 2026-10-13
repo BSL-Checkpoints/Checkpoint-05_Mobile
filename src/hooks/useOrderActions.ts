@@ -13,7 +13,8 @@ import type { Order, PaymentMethod } from '@/types/api';
 export function useCheckout() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: checkout,
+    // `pickupPointId` opcional: undefined = entrega, id = retirada naquele ponto.
+    mutationFn: (pickupPointId?: string) => checkout(pickupPointId),
     onSuccess: () => {
       // O carrinho virou pedido: ele esvaziou no servidor, e há um pedido novo.
       queryClient.invalidateQueries({ queryKey: queryKeys.cart.all });
