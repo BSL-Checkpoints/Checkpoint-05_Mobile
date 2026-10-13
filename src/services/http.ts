@@ -30,6 +30,16 @@ export function setCustomerToken(token: string | null) {
   customerToken = token;
 }
 
+/**
+ * Avisa a sessão quando o servidor responde 401 COM um cliente logado (token expirado
+ * ou revogado). Só dispara se havia token: um 401 no login (senha errada) não conta.
+ */
+let unauthorizedHandler: (() => void) | null = null;
+
+export function setUnauthorizedHandler(handler: (() => void) | null) {
+  unauthorizedHandler = handler;
+}
+
 http.interceptors.request.use((config) => {
   if (customerToken) {
     config.headers.set('Authorization', `Bearer ${customerToken}`);
@@ -48,6 +58,8 @@ http.interceptors.response.use(
   (error: AxiosError<{ error?: { code?: string; message?: string } }>) => {
     const status = error.response?.status ?? 0;
     const payload = error.response?.data?.error;
+
+    if (status === 401 && customerToken) unauthorizedHandler?.();
 
     if (payload) {
       return Promise.reject(new ApiError(payload.code ?? 'ERROR', payload.message ?? 'Erro na API', status));
