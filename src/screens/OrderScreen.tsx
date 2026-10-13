@@ -65,6 +65,19 @@ export function OrderScreen({ route }: Props) {
         <Text style={styles.total}>{money(order.total)}</Text>
       </View>
 
+      {/* CP5: o pedido reflete a escolha — retirada num ponto ou entrega. */}
+      {order.pickup ? (
+        <View style={styles.pickup}>
+          <Text style={styles.section}>Retirada</Text>
+          <Text style={styles.pickupName}>{order.pickup.name}</Text>
+          <Text style={styles.pickupText}>
+            {[order.pickup.address.street, order.pickup.address.number].filter(Boolean).join(', ')}
+            {order.pickup.address.city ? ` · ${order.pickup.address.city}` : ''}
+          </Text>
+          {order.pickup.hours ? <Text style={styles.pickupText}>{order.pickup.hours}</Text> : null}
+        </View>
+      ) : null}
+
       {paid && <Text style={styles.ok}>✓ Pagamento aprovado. Obrigado!</Text>}
 
       {pending && (
@@ -177,6 +190,9 @@ const styles = StyleSheet.create({
   ok: { fontSize: 15, fontWeight: '700', color: '#15803d', marginTop: 8 },
   pay: { marginTop: 4, gap: 10, backgroundColor: COLORS.white, borderRadius: 14, padding: 14, borderWidth: 1, borderColor: COLORS.primaryBorder },
   section: { fontSize: 13, fontWeight: '700', color: COLORS.gray, textTransform: 'uppercase' },
+  pickup: { marginTop: 8, gap: 2 },
+  pickupName: { fontSize: 15, fontWeight: '700', color: COLORS.black },
+  pickupText: { fontSize: 13, color: COLORS.black },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: {
     borderWidth: 1,
