@@ -5,11 +5,15 @@
  * isFetching (spinner discreto de "revalidando" sem apagar a lista).
  */
 import { useState } from 'react';
-import { FlatList, Image, Pressable, RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native';
+import { FlatList, Image, RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useProducts } from '@/hooks/useProducts';
 import { money } from '@/lib/format';
+import { FavoriteButton } from '@/components/FavoriteButton';
+import { PressableScale } from '@/components/PressableScale';
 import { Button, ErrorState, Loading } from '@/components/ui';
+import { listEntering, useMotionMode } from '@/lib/motion';
 import type { RootStackParamList } from '@/navigation';
 import type { ApiError } from '@/types/api';
 import { BACKGROUND, COLORS } from '@/styles/style';
@@ -18,6 +22,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Products'>;
 
 export function ProductsScreen({ navigation }: Props) {
   const [search, setSearch] = useState('');
+  const mode = useMotionMode();
   const { data, isLoading, isError, error, refetch, isFetching } = useProducts({ search });
 
   return (
@@ -33,19 +38,26 @@ export function ProductsScreen({ navigation }: Props) {
             <Text style={styles.headerSubtitle}>Ache os produtos favoritos do grupo</Text>
           </View>
 
-          <Pressable
+          <PressableScale
+            style={styles.iconButtonWrapper}
+            onPress={() => navigation.navigate('Profile')}
+            accessibilityLabel="Perfil"
+          >
+            <Text style={styles.iconButtonEmoji}>👤</Text>
+          </PressableScale>
+          <PressableScale
             style={styles.iconButtonWrapper}
             onPress={() => navigation.navigate('PickupPoints', { mode: 'browse' })}
             accessibilityLabel="Pontos de retirada"
           >
             <Text style={styles.iconButtonEmoji}>📍</Text>
-          </Pressable>
-          <Pressable style={styles.iconButtonWrapper} onPress={() => navigation.navigate('Orders')}>
+          </PressableScale>
+          <PressableScale style={styles.iconButtonWrapper} onPress={() => navigation.navigate('Orders')}>
             <Text style={styles.iconButtonEmoji}>📦</Text>
-          </Pressable>
-          <Pressable style={styles.iconButtonWrapper} onPress={() => navigation.navigate('Cart')}>
+          </PressableScale>
+          <PressableScale style={styles.iconButtonWrapper} onPress={() => navigation.navigate('Cart')}>
             <Text style={styles.iconButtonEmoji}>🛒</Text>
-          </Pressable>
+          </PressableScale>
         </View>
 
         <View style={styles.searchWrapper}>
@@ -87,9 +99,11 @@ export function ProductsScreen({ navigation }: Props) {
               />
             }
             ListEmptyComponent={<Text style={styles.empty}>Nenhum produto encontrado.</Text>}
-            renderItem={({ item }) => (
-              <Pressable
-                style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+            renderItem={({ item, index }) => (
+              // Entrada escalonada só nos primeiros itens (teto no atraso — ver lib/motion.ts).
+              <Animated.View style={styles.cell} entering={listEntering(index, mode)}>
+              <PressableScale
+                style={styles.card}
                 onPress={() => navigation.navigate('ProductDetail', { id: item.id, name: item.name })}
               >
                 <View style={styles.thumbWrapper}>
@@ -100,9 +114,7 @@ export function ProductsScreen({ navigation }: Props) {
                       <Text style={styles.thumbEmptyIcon}>🛍</Text>
                     </View>
                   )}
-                  <View style={styles.favBadge}>
-                    <Text style={styles.favIcon}>♡</Text>
-                  </View>
+                  <FavoriteButton productId={item.id} productName={item.name} style={styles.favBadge} />
                 </View>
 
                 <View style={styles.cardBody}>
@@ -120,7 +132,8 @@ export function ProductsScreen({ navigation }: Props) {
                       : `${money(item.priceFrom)} – ${money(item.priceTo)}`}
                   </Text>
                 </View>
-              </Pressable>
+              </PressableScale>
+              </Animated.View>
             )}
           />
         </>
@@ -213,33 +226,14 @@ const styles = StyleSheet.create({
     elevation: 1,
     gap: 8,
   },
-  cardPressed: {
-    backgroundColor: COLORS.primarySoft,
-    borderColor: COLORS.primary,
-  },
+  cell: { flex: 1 },
 
   thumbWrapper: { position: 'relative' },
   thumb: { width: '100%', height: 120, borderRadius: 14, backgroundColor: COLORS.background },
   thumbEmpty: { alignItems: 'center', justifyContent: 'center' },
   thumbEmptyIcon: { fontSize: 28, color: COLORS.gray },
 
-  favBadge: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    backgroundColor: COLORS.white,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 3,
-    elevation: 1,
-  },
-  favIcon: { fontSize: 14, color: COLORS.primary },
+  favBadge: { position: 'absolute', top: 8, right: 8 },
 
   cardBody: { gap: 2 },
   brand: {
