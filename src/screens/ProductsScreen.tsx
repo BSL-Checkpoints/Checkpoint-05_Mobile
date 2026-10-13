@@ -33,6 +33,13 @@ export function ProductsScreen({ navigation }: Props) {
             <Text style={styles.headerSubtitle}>Ache os produtos favoritos do grupo</Text>
           </View>
 
+          <Pressable
+            style={styles.iconButtonWrapper}
+            onPress={() => navigation.navigate('PickupPoints', { mode: 'browse' })}
+            accessibilityLabel="Pontos de retirada"
+          >
+            <Text style={styles.iconButtonEmoji}>📍</Text>
+          </Pressable>
           <Pressable style={styles.iconButtonWrapper} onPress={() => navigation.navigate('Orders')}>
             <Text style={styles.iconButtonEmoji}>📦</Text>
           </Pressable>
