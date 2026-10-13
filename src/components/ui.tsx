@@ -1,5 +1,17 @@
 /** Componentes de UI mínimos e reutilizados pelas telas. Nada de framework. */
-import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
+import { useEffect } from 'react';
+import { ActivityIndicator, StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
+import Animated, {
+  cancelAnimation,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
+import { PressableScale } from '@/components/PressableScale';
+import { MOTION, useMotionMode } from '@/lib/motion';
 
 /** Campo de texto padronizado (usado nas telas de login/cadastro). */
 export function TextField(props: TextInputProps) {
@@ -19,13 +31,46 @@ export function Center({ children }: { children: React.ReactNode }) {
   return <View style={styles.center}>{children}</View>;
 }
 
+/**
+ * Carregamento com "sinal de vida" (RF-53): três pontos que pulsam em sequência.
+ * No modo reduzido/desligado ficam só o indicador nativo e o texto, sem pulsar.
+ */
 export function Loading({ label = 'Carregando…' }: { label?: string }) {
+  const mode = useMotionMode();
   return (
     <Center>
       <ActivityIndicator size="large" />
+      {mode === 'full' && (
+        <View style={styles.dots}>
+          {[0, 1, 2].map((i) => (
+            <PulseDot key={i} delay={i * MOTION.loading.dotGapMs} />
+          ))}
+        </View>
+      )}
       <Text style={styles.muted}>{label}</Text>
     </Center>
   );
+}
+
+function PulseDot({ delay }: { delay: number }) {
+  const opacity = useSharedValue<number>(MOTION.loading.dimOpacity);
+
+  useEffect(() => {
+    opacity.value = withDelay(
+      delay,
+      withRepeat(
+        withSequence(
+          withTiming(1, { duration: MOTION.loading.dotMs }),
+          withTiming(MOTION.loading.dimOpacity, { duration: MOTION.loading.dotMs }),
+        ),
+        -1,
+      ),
+    );
+    return () => cancelAnimation(opacity);
+  }, [delay, opacity]);
+
+  const style = useAnimatedStyle(() => ({ opacity: opacity.value }));
+  return <Animated.View style={[styles.dot, style]} />;
 }
 
 /** Estado de erro com botão de tentar de novo (ex.: refetch de uma query). */
@@ -53,21 +98,19 @@ export function Button({
   variant?: 'primary' | 'ghost';
 }) {
   return (
-    <Pressable
+    <PressableScale
       onPress={onPress}
       disabled={disabled}
-      style={({ pressed }) => [
-        styles.btn,
-        variant === 'ghost' && styles.btnGhost,
-        (disabled || pressed) && styles.btnDim,
-      ]}
+      style={[styles.btn, variant === 'ghost' && styles.btnGhost, disabled && styles.btnDim]}
     >
       <Text style={[styles.btnText, variant === 'ghost' && styles.btnTextGhost]}>{label}</Text>
-    </Pressable>
+    </PressableScale>
   );
 }
 
 const styles = StyleSheet.create({
+  dots: { flexDirection: 'row', gap: 6, marginTop: 4 },
+  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#7E61D5' },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 8 },
   muted: { color: '#6b7280', textAlign: 'center' },
   errorTitle: { fontSize: 16, fontWeight: '700', color: '#b91c1c' },
