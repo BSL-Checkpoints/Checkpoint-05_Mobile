@@ -26,4 +26,15 @@ export const queryKeys = {
     detail: (id: string) => ['orders', 'detail', id] as const,
     timeline: (id: string) => ['orders', 'timeline', id] as const,
   },
+  // --- CP5 -----------------------------------------------------------------
+  reviews: {
+    all: ['reviews'] as const,
+    list: (productId: string) => ['reviews', 'list', productId] as const,
+    can: (productId: string) => ['reviews', 'can', productId] as const,
+  },
+  pickup: {
+    all: ['pickup'] as const,
+    list: (latitude: number | null, longitude: number | null) =>
+      ['pickup', 'list', latitude, longitude] as const,
+  },
 };

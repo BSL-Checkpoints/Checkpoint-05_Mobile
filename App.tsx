@@ -24,6 +24,8 @@ import { CartScreen } from '@/screens/CartScreen';
 import { CheckoutScreen } from '@/screens/CheckoutScreen';
 import { OrderScreen } from '@/screens/OrderScreen';
 import { OrdersScreen } from '@/screens/OrdersScreen';
+import { ReviewFormScreen } from '@/screens/ReviewFormScreen';
+import { PickupPointsScreen } from '@/screens/PickupPointsScreen';
 import type { AuthStackParamList, RootStackParamList } from '@/navigation';
 import { COLORS } from '@/styles/style';
 
@@ -61,6 +63,8 @@ function AppFlow() {
       <AppStack.Screen name="Checkout" component={CheckoutScreen} options={{ title: 'Checkout' }} />
       <AppStack.Screen name="Order" component={OrderScreen} options={{ title: 'Pedido' }} />
       <AppStack.Screen name="Orders" component={OrdersScreen} options={{ title: 'Meus pedidos' }} />
+      <AppStack.Screen name="ReviewForm" component={ReviewFormScreen} options={{ title: 'Avaliar produto' }} />
+      <AppStack.Screen name="PickupPoints" component={PickupPointsScreen} options={{ title: 'Retirada' }} />
     </AppStack.Navigator>
   );
 }
